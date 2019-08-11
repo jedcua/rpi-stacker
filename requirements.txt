@@ -1,0 +1,4 @@
+curtsies==0.3.0
+luma.core==1.12.0
+luma.led-matrix==1.4.0
+RPi.GPIO==0.7.0
