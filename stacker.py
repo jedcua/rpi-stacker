@@ -23,22 +23,20 @@ from threading import Thread
 
 
 class Line(object):
-    def __init__(self, x_start, y_pos, direction='right', length=4):
+    def __init__(self, x_start, direction='right', length=4):
         self._x = x_start
-        self._y = y_pos
-
         self._direction = direction
         self._length = length - 1
 
     def __str__(self):
-        return 'x:' + str(self._x) + ', y:' + str(self._y) + ', length:' + str(self._length)
+        return 'x:' + str(self._x) + ', length:' + str(self._length)
 
 
     def stop(self):
         self._direction = 'stop'
 
 
-    def update(self, draw):
+    def update(self, draw, y_pos):
         if self._direction == 'right':
             self._x += 1
             if self._x + self._length == 8:
@@ -50,7 +48,7 @@ class Line(object):
                 self._direction = 'right'
 
         draw.line(
-            [(self._x, self._y), (self._x + self._length, self._y)], 
+            [(self._x, y_pos), (self._x + self._length, y_pos)], 
             fill="white"
         )
 
@@ -115,7 +113,7 @@ class StackerGame(object):
 
         # Prepare for next line
         self._lines.append(
-            Line(-1, last_line._y - 1, length=new_length + 1)
+            Line(-1, length=new_length + 1)
         )
         self._interval *= 0.85
 
@@ -139,12 +137,12 @@ class StackerGame(object):
         # Play
         self._input_thread = Thread(target=self._handle_input)
         self._input_thread.start()
-        self._lines.append(Line(-1, 7, length=4))
+        self._lines.append(Line(-1, length=4))
 
         while self._state == 'play':
             with canvas(virtual) as draw:
-                for line in self._lines:
-                    line.update(draw)
+                for idx, line in enumerate(self._lines):
+                    line.update(draw, 7 - idx)
 
             time.sleep(self._interval)
 
