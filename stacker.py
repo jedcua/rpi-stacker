@@ -129,6 +129,11 @@ class StackerGame(object):
         self._lines.append(next_line)
         self._interval *= 0.95
         self._score += 1
+        print('Score: ' + str(self._score))
+
+        # Enable random rotation (hard mode)
+        if self._score >= 18:
+            self._device.capabilities(8, 8, random.randint(0, 3))
 
 
     def _display_msg(self, msg):
@@ -164,6 +169,7 @@ class StackerGame(object):
             time.sleep(self._interval)
 
         # Game Over
+        self._device.capabilities(8, 8, 0)
         self._display_msg('Game Over! Score: ' + str(self._score))
 
 
