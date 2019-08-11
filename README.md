@@ -13,13 +13,14 @@ $ sudo pip3 install -r requirements.txt
 2. Make sure SPI is enabled on your Raspberry Pi. If not follow the instructions [here](https://luma-led-matrix.readthedocs.io/en/latest/install.html).
 
 3. Connect the GPIO pins of you Raspberry Pi to MAX7219
-| MAX7219| RPi GPIO|
-|-------:|--------:|
-|     VCC|        2|
-|     GND|        6|
-|     DIN|       19|
-|      CS|       24|
-|     CLK|       23|
+
+| MAX7219 | RPi GPIO |
+|---------|----------|
+|      VCC|         2|
+|      GND|         6|
+|      DIN|        19|
+|       CS|        24|
+|      CLK|        23|
 
 4. Play!
 ```
