@@ -11,6 +11,7 @@ Cs  -> Pin 24
 Clk -> Pin 23
 """
 import time
+import random
 
 from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
@@ -59,7 +60,7 @@ class StackerGame(object):
         self._device = max7219(serial)
         self._virtual = viewport(self._device, width=8, height=8)
         self._state = 'play'
-        self._interval = 0.4
+        self._interval = 0.15
         self._lines = []
         self._score = 0
 
@@ -118,11 +119,15 @@ class StackerGame(object):
 
         print(new_length)
 
-        # Prepare for next line
-        self._lines.append(
-            Line(-1, length=new_length + 1)
-        )
-        self._interval *= 0.90
+        # Add next line going randomly from right or left
+        next_line = None
+        if random.choice([True, False]):
+            next_line = Line(-1, length=new_length + 1)
+        else:
+            next_line = Line(7 - new_length + 1, direction='left', length=new_length + 1)
+
+        self._lines.append(next_line)
+        self._interval *= 0.95
         self._score += 1
 
 
