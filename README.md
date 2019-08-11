@@ -22,7 +22,7 @@ $ sudo pip3 install -r requirements.txt
 |       CS|        24|
 |      CLK|        23|
 
-4. Play!
+4. Play! Press `spacebar` to place stacks
 ```
 $ ./stacker.py
 ```
