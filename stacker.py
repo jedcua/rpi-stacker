@@ -57,9 +57,11 @@ class StackerGame(object):
     def __init__(self):
         serial = spi(port=0, device=0, gpio=noop())
         self._device = max7219(serial)
+        self._virtual = viewport(self._device, width=8, height=8)
         self._state = 'play'
-        self._interval = 0.1
+        self._interval = 0.4
         self._lines = []
+        self._score = 0
 
 
     def _handle_input(self):
@@ -97,13 +99,18 @@ class StackerGame(object):
         x2 = min(7, min(last_line._x + last_line._length, prev_line._x + prev_line._length))
         new_length = max(0, x2 - x1)
 
-        # Handle Game over/Win
+        # Handle Game over
         if x2 < x1:
             self._state = 'game_over'
             return
+        # Handle overflow of lines
         elif len(self._lines) == 8:
-            self._state = 'win'
-            return
+            self._state = 'pause'
+            for i in range(5):
+                self._lines.pop(0)
+                time.sleep(0.1)
+                self._update_gfx()
+            self._state = 'play'
 
         # Remove unaligned dots from last line
         last_line._x = x1
@@ -115,7 +122,8 @@ class StackerGame(object):
         self._lines.append(
             Line(-1, length=new_length + 1)
         )
-        self._interval *= 0.85
+        self._interval *= 0.90
+        self._score += 1
 
 
     def _display_msg(self, msg):
@@ -128,8 +136,13 @@ class StackerGame(object):
         )
 
 
+    def _update_gfx(self):
+        with canvas(self._virtual) as draw:
+            for idx, line in enumerate(self._lines):
+                line.update(draw, 7 - idx)
+
+
     def run(self):
-        virtual = viewport(self._device, width=8, height=8)
 
         # Intro
         self._display_msg('RPi Stacker')
@@ -139,17 +152,14 @@ class StackerGame(object):
         self._input_thread.start()
         self._lines.append(Line(-1, length=4))
 
-        while self._state == 'play':
-            with canvas(virtual) as draw:
-                for idx, line in enumerate(self._lines):
-                    line.update(draw, 7 - idx)
+        while self._state == 'play' or self._state == 'pause':
+            if self._state == 'play':
+                self._update_gfx()
 
             time.sleep(self._interval)
 
-        if self._state == 'game_over':
-            self._display_msg('Game Over')
-        elif self._state == 'win':
-            self._display_msg('You win')
+        # Game Over
+        self._display_msg('Game Over! Score: ' + str(self._score))
 
 
 if __name__ == '__main__':
