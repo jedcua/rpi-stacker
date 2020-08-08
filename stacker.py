@@ -56,7 +56,7 @@ class Line(object):
 
 class StackerGame(object):
     def __init__(self):
-        serial = spi(port=0, device=0, gpio=noop())
+        serial = spi(port=0, device=0, gpio=noop(), cs_high=True)
         self._device = max7219(serial)
         self._virtual = viewport(self._device, width=8, height=8)
         self._state = 'play'
